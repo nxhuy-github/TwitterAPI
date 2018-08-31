@@ -6,7 +6,8 @@ from tweepy import Cursor
 
 import twitter_credentials
 import numpy as np 
-import pandas as pd 
+import pandas as pd
+import matplotlib.pyplot as plt
 
 class TweetAnalyzer():
         def tweets_to_data_frame(self, tweets):
@@ -89,10 +90,13 @@ class TwitterListener(StreamListener):
 		print(status)
 
 if __name__ == '__main__':
-	twitter_client = TwitterClient()
-	tweet_analyzer = TweetAnalyzer()
-	api = twitter_client.get_twitter_client_api()
-
-	tweets = api.user_timeline(screen_name='TheRealStanLee', count=20)
-	df = tweet_analyzer.tweets_to_data_frame(tweets)
-	print(df)
+        twitter_client = TwitterClient()
+        tweet_analyzer = TweetAnalyzer()
+        api = twitter_client.get_twitter_client_api()
+        tweets = api.user_timeline(screen_name='TheRealStanLee', count=20)
+        df = tweet_analyzer.tweets_to_data_frame(tweets)
+        ax = plt.axes()
+        ax.plot(df['date'], df['likes'], label='likes')
+        ax.plot(df['date'], df['retweets'], label='retweets')
+        ax.legend()
+        plt.show()
