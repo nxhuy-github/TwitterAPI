@@ -5,12 +5,26 @@ from tweepy import API
 from tweepy import Cursor
 
 import twitter_credentials
+import numpy as np 
+import pandas as pd 
+
+class TweetAnalyzer():
+        def tweets_to_data_frame(self, tweets):
+                df = pd.DataFrame(data=[[tweet.text, tweet.id,
+                                         len(tweet.text), tweet.created_at,
+                                         tweet.source, tweet.favorite_count,
+                                         tweet.retweet_count] for tweet in tweets],
+                                  columns=['tweets', 'id', 'len', 'date', 'source', 'likes', 'retweets'])
+                return df
 
 class TwitterClient():
 	def __init__(self, twitter_user=None):
 		self.auth = TwitterAuthenticator().authenticate_twitter_app()
 		self.twitter_client = API(self.auth)
 		self.twitter_user = twitter_user
+
+	def get_twitter_client_api(self):
+		return self.twitter_client
 
 	def get_user_timeline_tweets(self, num_tweets):
 		tweets = []
@@ -75,12 +89,10 @@ class TwitterListener(StreamListener):
 		print(status)
 
 if __name__ == '__main__':
-	hash_tag_list = ['donald trump', 'hillary clinton', 'barack obama']
-	fetched_tweets_filename = 'tweets.json'
+	twitter_client = TwitterClient()
+	tweet_analyzer = TweetAnalyzer()
+	api = twitter_client.get_twitter_client_api()
 
-	tweet_client = TwitterClient('TheRealStanLee')
-	print(tweet_client.get_home_timeline_tweets(1))
-
-	# twitter_streamer = TwitterStreamer()
-	# twitter_streamer.stream_tweets(fetched_tweets_filename, hash_tag_list)
-
+	tweets = api.user_timeline(screen_name='TheRealStanLee', count=20)
+	df = tweet_analyzer.tweets_to_data_frame(tweets)
+	print(df)
